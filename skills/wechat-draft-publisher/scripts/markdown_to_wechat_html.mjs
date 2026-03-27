@@ -318,6 +318,44 @@ function applyWechatTaskListMarkers($, theme) {
   $("[data-wechat-task]").removeAttr("data-wechat-task");
 }
 
+/**
+ * 公众号对原生 <ul>/<ol>/<li> 支持差：改成「一块外层 + 多条内层 <p>」，无序加「• 」，有序加「1. 」「2. 」…
+ * 不能用外层 <p> 包内层 <p>（非法 HTML，解析器会拆碎）；外层用 <div>，样式与段落块一致。
+ */
+function convertListsToNestedParagraphs($, theme) {
+  const outerStyle = `margin:12px 0;font-size:16px;line-height:1.75;color:${theme.text};`;
+  const innerStyle = `margin:4px 0;font-size:16px;line-height:1.75;color:${theme.text};`;
+
+  while (true) {
+    const leaves = $("ul, ol").filter(
+      (_, el) => $(el).find("ul, ol").length === 0
+    );
+    if (!leaves.length) break;
+
+    leaves.each((_, el) => {
+      const $list = $(el);
+      const tag = (el.tagName || "").toLowerCase();
+      let body = "";
+
+      if (tag === "ul") {
+        $list.children("li").each((__, li) => {
+          const inner = $(li).html() ?? "";
+          body += `<p style="${innerStyle}">• ${inner}</p>`;
+        });
+      } else {
+        let n = 0;
+        $list.children("li").each((__, li) => {
+          n += 1;
+          const inner = $(li).html() ?? "";
+          body += `<p style="${innerStyle}">${n}. ${inner}</p>`;
+        });
+      }
+
+      $list.replaceWith(`<div style="${outerStyle}">${body}</div>`);
+    });
+  }
+}
+
 function sanitizeAndAdapt(html, safeImageDomain, theme) {
   const $ = load(html, { decodeEntities: false });
 
@@ -355,6 +393,7 @@ function sanitizeAndAdapt(html, safeImageDomain, theme) {
   });
 
   applyWechatTaskListMarkers($, theme);
+  convertListsToNestedParagraphs($, theme);
 
   const inner = $("body").html() ?? $.root().html() ?? "";
   return `<section style="font-size:16px;line-height:1.75;color:${theme.text};max-width:100%;box-sizing:border-box;">${inner}</section>`;
