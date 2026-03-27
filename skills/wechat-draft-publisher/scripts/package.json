@@ -1,0 +1,16 @@
+{
+  "name": "wechat-markdown-html-converter",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "convert": "node ./markdown_to_wechat_html.mjs",
+    "publish": "node ./publish_to_wechat_draft.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.6.1",
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.1.0"
+  }
+}

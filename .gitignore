@@ -1,5 +1,22 @@
+# Dependencies
 node_modules/
-dist/
-*.png
+
+# Secrets & local env (keep *.example tracked)
 .env
+.env.local
+.env.*.local
+
+# Logs & debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Editor / IDE (optional local settings)
+.idea/
+*.swp
+*.swo
