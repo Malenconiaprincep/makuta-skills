@@ -191,7 +191,7 @@ function buildMarkdownIt(theme) {
     const token = tokens[idx];
     const tag = token.tag;
     const styles = {
-      h1: `font-size:22px;font-weight:700;color:${theme.heading1};margin:24px 0 16px;line-height:1.35;border-bottom:3px solid ${theme.accent};padding-bottom:10px;`,
+      h1: `font-size:22px;font-weight:700;color:${theme.heading1};margin:24px 0 16px;line-height:1.35;`,
       h2: `font-size:19px;font-weight:700;color:${theme.heading2};margin:22px 0 12px;line-height:1.4;`,
       h3: `font-size:17px;font-weight:600;color:${theme.heading3};margin:18px 0 10px;line-height:1.45;border-left:4px solid ${theme.accent};padding-left:10px;`,
       h4: `font-size:16px;font-weight:600;color:${theme.heading4};margin:16px 0 8px;`,
@@ -358,6 +358,15 @@ function convertListsToNestedParagraphs($, theme) {
 
 function sanitizeAndAdapt(html, safeImageDomain, theme) {
   const $ = load(html, { decodeEntities: false });
+
+  // 草稿/图文已有「标题」字段，正文里首个 # 会与顶栏重复，去掉首个 <h1>
+  const $firstH1 = $("h1").first();
+  if ($firstH1.length) {
+    const $after = $firstH1.next();
+    $firstH1.remove();
+    const tag = ($after[0]?.tagName || "").toLowerCase();
+    if (tag === "hr") $after.remove();
+  }
 
   $("script,iframe,object,embed,style,link").remove();
 
